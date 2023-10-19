@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping List</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="images/site-logo.png" type="image/png">
+
+    <!-- Add a description meta tag for better search engine results -->
+    <meta name="description" content="Your trusted companion for organized and budget-conscious shopping. Simplify your shopping experience with Shopping List.">
+
+    <!-- Add keywords meta tag if you want to specify relevant keywords -->
+    <meta name="keywords" content="shopping, budget, lists, groceries, shopping list">
+
+    <!-- Add author meta tag if needed -->
+    <meta name="author" content="Your Name">
+
+    <!-- Add a viewport meta tag for responsive design -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph meta tags for social media sharing -->
+    <meta property="og:title" content="Shopping List">
+    <meta property="og:description" content="Your trusted companion for organized and budget-conscious shopping. Simplify your shopping experience with Shopping List.">
+    <meta property="og:image" content="images/site-logo.png">
+    <meta property="og:url" content="https://yourwebsite.com">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.15.0/pdf-lib.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.71/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.71/vfs_fonts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <!-- Include the Calisto-MT-Italic font -->
+    <link href="https://fonts.googleapis.com/css2?family=Calisto+MT&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="Index.html">
+            <!--logo image-->
+            <img src="images/site-logo.png" alt="Task Master Logo">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <!-- Add your Signup and Login links here -->
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">My Lists</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="contactUs.html">Contact Us</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <script>
+        document.getElementById("navbar-toggler").addEventListener("click", function () {
+            var navbarCollapse = document.getElementById("navbar-collapse");
+            if (navbarCollapse.style.maxHeight) {
+                navbarCollapse.style.maxHeight = null;
+            } else {
+                navbarCollapse.style.maxHeight = navbarCollapse.scrollHeight + "px";
+            }
+        });
+    </script>
+    <br>
+    <br>
+    <!-- Main Content -->
+    <div class="container">
+        <h1 class="heading">Shopping List</h1>
+
+        <div class="total-container">
+            <div class="form-group">
+                <label for="total-budget" class="budget-label">Enter Your Total Budget:</label>
+                <input type="number" class="form-control add-input" id="total-budget" placeholder="E.g., 100">
+                <button class="btn btn-primary add-button" id="budget-submit">Submit Budget</button>
+            </div>
+        </div>
+
+        <div class="list-container">
+            <ul class="item-list">
+                <!-- List items will be dynamically added here -->
+            </ul>
+        </div>
+
+        <div class="add-container">
+            <div class="form-group">
+                <label for="new-item">Item Name:</label>
+                <input type="text" class="form-control add-input" id="new-item" placeholder="E.g., Apples">
+            </div>
+            <div class="form-group">
+                <label for="item-shop">Shop (Optional):</label>
+                <input type="text" class="form-control add-input" id="item-shop" placeholder="E.g., Supermart">
+            </div>
+            <div class="form-group">
+                <label for="item-price">Price:</label>
+                <input type="number" class="form-control add-input" id="item-price" placeholder="E.g., 5.99">
+            </div>
+            <div class="form-group">
+                <label for="item-description">Description (Optional):</label>
+                <input type="text" class="form-control add-input" id="item-description" placeholder="E.g., Fresh and juicy">
+            </div>
+            <button class="btn btn-primary add-button" id="add-button" disabled>Add Item</button>
+        </div>
+
+        <p class="budget-label" id="budget-status"></p>
+
+        <!-- Save and Download Buttons -->
+        <button class="btn btn-primary" id="save-list">Save List</button>
+        <button class="btn btn-success" id="download-list" download="shopping-list.txt">Download List</button>
+        <!-- Button to Retrieve Saved List -->
+        <button class="btn btn-primary" id="retrieve-list">Retrieve Saved List</button>
+    
+        <!-- Modal -->
+        <div class="modal fade" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="itemModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="itemModalLabel">Item Details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p><b>Item:</b> <span id="modal-item-name"></span></p>
+                        <p id="modal-item-description"></p>
+                        <p id="modal-item-price"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <!-- Footer -->
+    <footer class="text-center text-white" style="background-color: #1270c7">
+        <!-- Grid container -->
+        <div class="container5">
+            <!-- Section: Links -->
+            <section class="mt-5">
+                <!-- Grid row-->
+                <div class="row text-center d-flex justify-content-center pt-5">
+                    <!-- Grid column -->
+                    <div class="col-md-2">
+                        <h6 class="text-uppercase font-weight-bold">
+                            <a href="#!" class="text-white">About us</a>
+                        </h6>
+                    </div>
+                    <!-- Grid column -->
+        
+                    <!-- Grid column -->
+                    <div class="col-md-2">
+                        <h6 class="text-uppercase font-weight-bold">
+                            <a href="#!" class="text-white">Products</a>
+                        </h6>
+                    </div>
+                    <!-- Grid column -->
+        
+                    <!-- Grid column -->
+                    <div class="col-md-2">
+                        <h6 class="text-uppercase font-weight-bold">
+                            <a href="#!" class="text-white">Awards</a>
+                        </h6>
+                    </div>
+                    <!-- Grid column -->
+        
+                    <!-- Grid column -->
+                    <div class="col-md-2">
+                        <h6 class="text-uppercase font-weight-bold">
+                            <a href="#!" class="text-white">Help</a>
+                        </h6>
+                    </div>
+                    <!-- Grid column -->
+        
+                    <!-- Grid column -->
+                    <div class="col-md-2">
+                        <h6 class="text-uppercase font-weight-bold">
+                            <a href="contactUs.html" class="text-white">Contact</a>
+                        </h6>
+                    </div>
+                    <!-- Grid column -->
+                </div>
+                <!-- Grid row-->
+            </section>
+            <!-- Section: Links -->
+    
+            <hr class="my-5" />
+    
+            <!-- Section: Text -->
+            <section class="mb-5">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-lg-8">
+                        <p>
+                            Welcome to Shopping List, your trusted companion for organized and budget-conscious shopping. 
+                            Our mission is to make your shopping experience seamless and efficient. Whether you're creating a grocery list, 
+                            planning a big shopping trip, or just need a simple to-do list, 
+                            we've got you covered. With user-friendly features and the ability to track your budget, 
+                            Shopping List is here to simplify your life. Say goodbye to forgotten items and overspending 
+                            – start shopping smarter today with Shopping List!
+                        </p>
+                    </div>
+                </div>
+            </section>
+            <!-- Section: Text -->
+    
+            <!-- Section: Social -->
+            <section class="text-center mb-5">
+                <a href="" class="text-white me-4">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="" class="text-white me-4">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="" class="text-white me-4">
+                    <i class="fab fa-google"></i>
+                </a>
+                <a href="" class="text-white me-4">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="" class="text-white me-4">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="" class="text-white me-4">
+                    <i class="fab fa-github"></i>
+                </a>
+            </section>
+            <!-- Section: Social -->
+        </div>
+        <!-- Grid container -->
+    
+        <!-- Copyright -->
+        <div
+            class="text-center p-3"
+            style="background-color: rgba(0, 0, 0, 0.2)"
+            >
+            © 2023 Copyright:
+            <a class="text-white" href="https://mdbootstrap.com/"
+            >Soso Unplugged</a
+            >
+        </div>
+        <!-- Copyright -->
+    </footer>
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.15.0/pdf-lib.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.71/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.71/vfs_fonts.js"></script>
+    <script src="js/shoppingList.js">
+    </script>
+</body>
+</html>
